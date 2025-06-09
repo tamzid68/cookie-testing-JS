@@ -1,41 +1,52 @@
+// This code sets up a simple Express.js application with session management.
 const express = require('express');
-const crypto = require('crypto');
-
 const app = express();
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-
-app.post('/signin', (req, res) => {
-  const { password , username} = req.body;
-  const data = {
-    username: username,
-    password: password
+app.use(session({
+  secret: 'signature',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 900000, // 15 minutes
+    httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
   }
-  // check from database
-  if (!password) return res.status(400).send('Password required');
-  const hash = crypto.createHmac('sha256',"8273asdfb",data).digest('hex');
-  // hased  value 
-  res.send(`Hashed value: ${hash}`);
+}));
+
+app.post('/login', (req, res) => {
+  const { username } = req.body || {};
+
+  if (!username) return res.status(400).send('Username required');
+
+  req.session.username = username;
+  req.session.loggedIn = true;
+  res.send('Session is set');
 });
 
-app.get('/protected', (req, res) => {
-  const hash = req.body.hash; 
-  const data ={
-    username:"asm",
-    password:"tast"
+app.get('/product', (req, res) => {
+  if (req.session.loggedIn) {
+    res.send(`Welcome to the product page, ${req.session.username}`);
   }
-  const hash2 = crypto.createHmac('sha256',"8273asdfb",data).digest('hex');
-  if (hash === hash2) {
-    res.send(`Hello ${data.username}, you have access to this protected route!`);
-  } else {
-    res.status(401).send('Unauthorized');
+  else {
+    res.status(403).send('Access denied. You are not allowed to view this page.');
   }
 });
 
-
+app.post('/logout',(req,res)=>{
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send('Could not log out');
+    }
+    res.clearCookie('connect.sid'); // Clear the session cookie
+    res.send('Logged out successfully');
+  });
+});
 
 app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
+  console.log('Server is running on localhost:3000');
 });

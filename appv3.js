@@ -37,7 +37,7 @@ app.get('/product', (req, res) => {
   }
 });
 
-app.post('/logout',(req,res)=>{
+app.post('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       return res.status(500).send('Could not log out');

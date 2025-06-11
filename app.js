@@ -1,3 +1,4 @@
+// Simple Express.js app demonstrating JWT-based authentication.
 const express = require('express');
 const app = express();
 const jwt = require('jsonwebtoken');
@@ -9,7 +10,7 @@ app.use(bodyParser.json());
 app.post('/login', (req, res)=>{
     const {username, password} = req.body || {};
 
-    if(username === 'tamzid' && password === '1234'){
+    if(username === 'asm' && password === '1234'){
         const playload = {username, password};
         const token = jwt.sign(playload, JWT_SECRET, {expiresIn: '15m'});
         return res.json({token});

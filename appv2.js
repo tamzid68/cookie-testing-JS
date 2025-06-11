@@ -1,3 +1,4 @@
+// Simple Express.js app demonstrating basic authentication using HMAC hashing.
 const express = require('express');
 const crypto = require('crypto');
 const app = express();

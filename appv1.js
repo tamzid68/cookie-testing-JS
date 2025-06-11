@@ -1,3 +1,4 @@
+// Simple Express.js app demonstrating cookie-based login and session management.
 const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser');
